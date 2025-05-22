@@ -32,7 +32,6 @@ st.title("🚘 License Plate Detector with Browser Webcam")
 
 if 'detected_text' not in st.session_state:
     st.session_state.detected_text = "Not Detected"
-
 webrtc_streamer(
     key="license-plate-detector",
     video_frame_callback=video_frame_callback,
@@ -40,9 +39,18 @@ webrtc_streamer(
     async_processing=True,
     rtc_configuration={
         "iceServers": [
-            {"urls": ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"]}
+            {"urls": ["stun:stun.l.google.com:19302"]},  # STUN server
+            {
+                "urls": [
+                    "turn:turn.xirsys.com:3478?transport=udp",
+                    "turn:turn.xirsys.com:3478?transport=tcp"
+                ],
+                "username": "mohdnazim",        # 👈 Replace with your real Xirsys username
+                "credential": "Abcd+1234"        # 👈 Replace with your real Xirsys credential
+            }
         ]
     },
 )
+
 
 st.markdown(f"### Detected Plate: **{st.session_state.detected_text}**")

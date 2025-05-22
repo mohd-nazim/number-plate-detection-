@@ -1,10 +1,9 @@
 import streamlit as st
 from streamlit_webrtc import webrtc_streamer
 import cv2
-import numpy as np
 import pytesseract
 
-# Load Haar cascade
+# Haar cascade file path (ensure this file is in the same directory or give full path)
 plate_cascade = cv2.CascadeClassifier('haarcascade_russian_plate_number.xml')
 
 def detect_plate(frame):
@@ -18,7 +17,10 @@ def detect_plate(frame):
         if text:
             detected_text = text
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        cv2.putText(frame, detected_text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (36,255,12), 2)
+        cv2.putText(frame, detected_text, (x, y - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (36,255,12), 2)
+    # Update detected text in session state
+    st.session_state.detected_text = detected_text
     return frame
 
 def video_frame_callback(frame):
@@ -28,10 +30,19 @@ def video_frame_callback(frame):
 
 st.title("🚘 License Plate Detector with Browser Webcam")
 
+if 'detected_text' not in st.session_state:
+    st.session_state.detected_text = "Not Detected"
+
 webrtc_streamer(
     key="license-plate-detector",
     video_frame_callback=video_frame_callback,
     media_stream_constraints={"video": True, "audio": False},
     async_processing=True,
+    rtc_configuration={
+        "iceServers": [
+            {"urls": ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"]}
+        ]
+    },
 )
 
+st.markdown(f"### Detected Plate: **{st.session_state.detected_text}**")

@@ -31,7 +31,7 @@ plate_text_display = st.empty()
 plate_cascade = cv2.CascadeClassifier('haarcascade_russian_plate_number.xml')
 
 # Start camera
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture("sample_video.mp4")
 
 # Loop for video
 while run:
